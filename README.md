@@ -4,6 +4,8 @@ This is a repository of a collection of my reports/projects/research projects an
 
 ## Kaczmarz Iteration.pdf
 
+School Project using Kaczmarz Iteration to solve an inverse problem that is ill-posed. 
+
 ## Image Reconstruction - Tikhonov Regularization.pdf
 
 ## 1708-Devathi-TohokuPoster-Final.pdf
