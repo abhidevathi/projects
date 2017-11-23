@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017) (preloaded format=pdflatex 2017.5.23)  17 NOV 2017 13:43
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017) (preloaded format=pdflatex 2017.5.23)  23 NOV 2017 11:11
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -24,8 +24,6 @@ File: size10.clo 2014/09/29 v1.4h Standard LaTeX file (size option)
 \belowcaptionskip=\skip42
 \bibindent=\dimen102
 )
-No auxiliary output files.
-
 (/usr/local/texlive/2017/texmf-dist/tex/latex/float/float.sty
 Package: float 2001/11/08 v1.3d Float enhancements (AL)
 \c@float@type=\count87
@@ -491,20 +489,22 @@ Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 2
 \Hy@SectionHShift=\skip50
 )
 (./Kaczmarz.aux)
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 26.
-LaTeX Font Info:    ... okay on input line 26.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 26.
-LaTeX Font Info:    ... okay on input line 26.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 26.
-LaTeX Font Info:    ... okay on input line 26.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 26.
-LaTeX Font Info:    ... okay on input line 26.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 26.
-LaTeX Font Info:    ... okay on input line 26.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 26.
-LaTeX Font Info:    ... okay on input line 26.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 26.
-LaTeX Font Info:    ... okay on input line 26.
+\openout1 = `Kaczmarz.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 25.
+LaTeX Font Info:    ... okay on input line 25.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 25.
+LaTeX Font Info:    ... okay on input line 25.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 25.
+LaTeX Font Info:    ... okay on input line 25.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 25.
+LaTeX Font Info:    ... okay on input line 25.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 25.
+LaTeX Font Info:    ... okay on input line 25.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 25.
+LaTeX Font Info:    ... okay on input line 25.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 25.
+LaTeX Font Info:    ... okay on input line 25.
 
 (/usr/local/texlive/2017/texmf-dist/tex/latex/graphics/graphicx.sty
 Package: graphicx 2014/10/28 v1.0g Enhanced LaTeX Graphics (DPC,SPQR)
@@ -576,7 +576,7 @@ File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
 e
 ))
 \AtBeginShipoutBox=\box35
-Package hyperref Info: Link coloring OFF on input line 26.
+Package hyperref Info: Link coloring OFF on input line 25.
 
 (/usr/local/texlive/2017/texmf-dist/tex/latex/hyperref/nameref.sty
 Package: nameref 2016/05/21 v2.44 Cross-referencing by name of section
@@ -586,38 +586,39 @@ Package: gettitlestring 2016/05/16 v1.5 Cleanup title references (HO)
 )
 \c@section@level=\count155
 )
-LaTeX Info: Redefining \ref on input line 26.
-LaTeX Info: Redefining \pageref on input line 26.
-LaTeX Info: Redefining \nameref on input line 26.
-LaTeX Font Info:    Try loading font information for U+msa on input line 28.
+LaTeX Info: Redefining \ref on input line 25.
+LaTeX Info: Redefining \pageref on input line 25.
+LaTeX Info: Redefining \nameref on input line 25.
+
+(./Kaczmarz.out) (./Kaczmarz.out)
+\@outlinefile=\write3
+\openout3 = `Kaczmarz.out'.
+
+LaTeX Font Info:    Try loading font information for U+msa on input line 27.
 
 (/usr/local/texlive/2017/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Try loading font information for U+msb on input line 28.
+LaTeX Font Info:    Try loading font information for U+msb on input line 27.
 
 (/usr/local/texlive/2017/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
-LaTeX Font Info:    Try loading font information for U+rsfs on input line 28.
+LaTeX Font Info:    Try loading font information for U+rsfs on input line 27.
 
 (/usr/local/texlive/2017/texmf-dist/tex/latex/jknapltx/ursfs.fd
 File: ursfs.fd 1998/03/24 rsfs font definition file (jk)
 )
-LaTeX Font Info:    Try loading font information for U+lasy on input line 28.
+LaTeX Font Info:    Try loading font information for U+lasy on input line 27.
 
 (/usr/local/texlive/2017/texmf-dist/tex/latex/base/ulasy.fd
 File: ulasy.fd 1998/08/17 v2.2e LaTeX symbol font definitions
-)
+) (./Kaczmarz.toc)
+\tf@toc=\write4
+\openout4 = `Kaczmarz.toc'.
 
-LaTeX Warning: Reference `fig:Piecewise' on page 1 undefined on input line 58.
 
-<Piecewise.png, id=4, 562.2606pt x 421.575pt>
-File: Piecewise.png Graphic file (type png)
- <use Piecewise.png>
-Package pdftex.def Info: Piecewise.png used on input line 63.
-(pdftex.def)             Requested size: 379.4838pt x 284.52756pt.
- [1
+[1
 Non-PDF special ignored!
 Non-PDF special ignored!
 Non-PDF special ignored!
@@ -627,157 +628,99 @@ Non-PDF special ignored!
 Non-PDF special ignored!
 Non-PDF special ignored!
 Non-PDF special ignored!{/usr/local/texlive/2017/texmf-var/fonts/map/pdftex/upd
-map/pdftex.map}
+map/pdftex.map}] <Piecewise.png, id=107, 562.2606pt x 421.575pt>
+File: Piecewise.png Graphic file (type png)
 
-
-
-]
-LaTeX Font Info:    Calculating math sizes for size <17> on input line 77.
+<use Piecewise.png>
+Package pdftex.def Info: Piecewise.png used on input line 62.
+(pdftex.def)             Requested size: 379.4838pt x 284.52756pt.
+ [2 <./Piecewise.png (PNG copy)>]
+LaTeX Font Info:    Calculating math sizes for size <17> on input line 76.
 
 
 LaTeX Font Warning: Font shape `OT1/cmr/m/n' in size <8.5> not available
-(Font)              size <8> substituted on input line 77.
+(Font)              size <8> substituted on input line 76.
 
 
 LaTeX Font Warning: Font shape `OML/cmm/m/it' in size <8.5> not available
-(Font)              size <8> substituted on input line 77.
+(Font)              size <8> substituted on input line 76.
 
 
 LaTeX Font Warning: Font shape `OMS/cmsy/m/n' in size <8.5> not available
-(Font)              size <8> substituted on input line 77.
+(Font)              size <8> substituted on input line 76.
 
 
 LaTeX Font Warning: Font shape `U/rsfs/m/n' in size <8.5> not available
-(Font)              size <8> substituted on input line 77.
+(Font)              size <8> substituted on input line 76.
 
 
 LaTeX Font Warning: Font shape `U/lasy/m/n' in size <8.5> not available
-(Font)              size <8> substituted on input line 77.
+(Font)              size <8> substituted on input line 76.
 
-<Comparison.png, id=26, 562.2606pt x 421.575pt>
+<Comparison.png, id=120, 562.2606pt x 421.575pt>
 File: Comparison.png Graphic file (type png)
  <use Comparison.png>
-Package pdftex.def Info: Comparison.png used on input line 86.
+Package pdftex.def Info: Comparison.png used on input line 85.
 (pdftex.def)             Requested size: 379.4838pt x 284.52756pt.
- [2
-
-
-
-
- <./Piecewise.png (PNG copy)>]
-
-LaTeX Warning: Reference `fig:Comparison' on page 3 undefined on input line 92.
-
-
-LaTeX Font Info:    Calculating math sizes for size <14> on input line 99.
-[3
-
-
-
-
-
- <./Comparison.png (PNG copy)>]
-
-LaTeX Warning: Reference `fig:Singular Values' on page 4 undefined on input lin
-e 142.
-
-<SingularValues.png, id=49, 562.2606pt x 421.575pt>
+LaTeX Font Info:    Calculating math sizes for size <14> on input line 98.
+ [3 <./Comparison.png (PNG copy)>] <SingularValues.png, id=133, 562.2606pt x 42
+1.575pt>
 File: SingularValues.png Graphic file (type png)
- <use SingularValues.png>
-Package pdftex.def Info: SingularValues.png used on input line 147.
+
+<use SingularValues.png>
+Package pdftex.def Info: SingularValues.png used on input line 146.
 (pdftex.def)             Requested size: 379.4838pt x 284.52756pt.
-
-[4
-
-
-
-
- <./SingularValues.png (PNG copy)>]
-<PoopSolution.png, id=58, 562.2606pt x 421.575pt>
+ [4]
+<PoopSolution.png, id=141, 562.2606pt x 421.575pt>
 File: PoopSolution.png Graphic file (type png)
  <use PoopSolution.png>
-Package pdftex.def Info: PoopSolution.png used on input line 160.
+Package pdftex.def Info: PoopSolution.png used on input line 159.
 (pdftex.def)             Requested size: 379.4838pt x 284.52756pt.
 
-<Noiseless.png, id=59, 562.2606pt x 421.575pt>
+[5 <./SingularValues.png (PNG copy)>]
+<Noiseless.png, id=148, 562.2606pt x 421.575pt>
 File: Noiseless.png Graphic file (type png)
  <use Noiseless.png>
-Package pdftex.def Info: Noiseless.png used on input line 173.
+Package pdftex.def Info: Noiseless.png used on input line 172.
 (pdftex.def)             Requested size: 265.63522pt x 199.16928pt.
 
-<Residuals-Noiseless.png, id=60, 562.2606pt x 421.575pt>
+<Residuals-Noiseless.png, id=149, 562.2606pt x 421.575pt>
 File: Residuals-Noiseless.png Graphic file (type png)
 
 <use Residuals-Noiseless.png>
-Package pdftex.def Info: Residuals-Noiseless.png used on input line 173.
+Package pdftex.def Info: Residuals-Noiseless.png used on input line 172.
 (pdftex.def)             Requested size: 265.63522pt x 199.16928pt.
-
-
-LaTeX Warning: Reference `fig:Piecewise' on page 5 undefined on input line 174.
-
-
-
-LaTeX Warning: Reference `fig:Piecewise' on page 5 undefined on input line 174.
-
-
-[5
-
-
-
-
-
- <./PoopSolution.png (PNG copy)>]
-
-LaTeX Warning: Reference `fig:Noiseless' on page 6 undefined on input line 177.
-
-
-<Iteration.png, id=71, 1445.4pt x 803.1606pt>
+ [6 <./PoopSolution.png (PNG copy)>]
+<Iteration.png, id=158, 1445.4pt x 803.1606pt>
 File: Iteration.png Graphic file (type png)
  <use Iteration.png>
-Package pdftex.def Info: Iteration.png used on input line 190.
+Package pdftex.def Info: Iteration.png used on input line 189.
 (pdftex.def)             Requested size: 665.64195pt x 369.88582pt.
- [6
-
-
-
- <./Noiseless.png (PNG copy)> <./Residuals-Noiseless.png (PNG copy)>]
-
-LaTeX Warning: Reference `fig:Iteration' on page 7 undefined on input line 195.
-
-
-[7
-
-
-
- <./Iteration.png (PNG copy)>]
+ [7 <./Noiseless.png (PNG copy)> <./Residuals-Noiseless.png (PNG copy)>] [8 <./
+Iteration.png (PNG copy)>]
 LaTeX Font Info:    Font shape `OT1/cmtt/bx/n' in size <12> not available
-(Font)              Font shape `OT1/cmtt/m/n' tried instead on input line 205.
- [8
-
-
-]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 278.
- [9
-
-]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 278.
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 278.
-Package atveryend Info: Empty hook `AtEndAfterFileList' on input line 278.
+(Font)              Font shape `OT1/cmtt/m/n' tried instead on input line 204.
+ [9]
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 277.
+ [10]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 277.
+ (./Kaczmarz.aux)
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 277.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 277.
+Package rerunfilecheck Info: File `Kaczmarz.out' has not changed.
+(rerunfilecheck)             Checksum: 9119C9DB0522BF3722207080C8F6FD7E;1132.
 
 
 LaTeX Font Warning: Size substitutions with differences
 (Font)              up to 0.5pt have occurred.
 
-
-LaTeX Warning: There were undefined references.
-
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 278.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 277.
  ) 
 Here is how much of TeX's memory you used:
- 14274 strings out of 492995
- 237708 string characters out of 6132704
- 334392 words of memory out of 5000000
- 17573 multiletter control sequences out of 15000+600000
+ 14306 strings out of 492995
+ 238133 string characters out of 6132704
+ 335587 words of memory out of 5000000
+ 17596 multiletter control sequences out of 15000+600000
  20281 words of font info for 89 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  36i,14n,40p,658b,458s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -801,10 +744,10 @@ texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/local/texlive/2017/t
 exmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/local/texlive/2017/te
 xmf-dist/fonts/type1/public/amsfonts/cm/cmtt12.pfb></usr/local/texlive/2017/tex
 mf-dist/fonts/type1/public/rsfs/rsfs10.pfb>
-Output written on Kaczmarz.pdf (9 pages, 627228 bytes).
+Output written on Kaczmarz.pdf (10 pages, 633098 bytes).
 PDF statistics:
- 173 PDF objects out of 1000 (max. 8388607)
- 133 compressed objects within 2 object streams
- 39 named destinations out of 1000 (max. 500000)
- 36 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 258 PDF objects out of 1000 (max. 8388607)
+ 215 compressed objects within 3 object streams
+ 40 named destinations out of 1000 (max. 500000)
+ 180 words of extra memory for PDF output out of 10000 (max. 10000000)
 

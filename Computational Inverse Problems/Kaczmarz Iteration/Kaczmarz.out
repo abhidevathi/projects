@@ -1,0 +1,18 @@
+\BOOKMARK [1][-]{section.1}{Looking at the Problem}{}% 1
+\BOOKMARK [1][-]{section.2}{Setting Up The Problem}{}% 2
+\BOOKMARK [2][-]{subsection.2.1}{True Function}{section.2}% 3
+\BOOKMARK [1][-]{section.3}{Laplace Transformation}{}% 4
+\BOOKMARK [2][-]{subsection.3.1}{Two Kinds}{section.3}% 5
+\BOOKMARK [2][-]{subsection.3.2}{Discretization}{section.3}% 6
+\BOOKMARK [2][-]{subsection.3.3}{Matlab}{section.3}% 7
+\BOOKMARK [3][-]{subsubsection.3.3.1}{Data Generation}{subsection.3.3}% 8
+\BOOKMARK [3][-]{subsubsection.3.3.2}{Discretization Points for t}{subsection.3.3}% 9
+\BOOKMARK [3][-]{subsubsection.3.3.3}{Computing Forward Matrix A}{subsection.3.3}% 10
+\BOOKMARK [2][-]{subsection.3.4}{Minimum Norm Solution}{section.3}% 11
+\BOOKMARK [1][-]{section.4}{Kaczmarz Iteration}{}% 12
+\BOOKMARK [2][-]{subsection.4.1}{Noiseless Data}{section.4}% 13
+\BOOKMARK [2][-]{subsection.4.2}{Adding Noise to Kaczmarz}{section.4}% 14
+\BOOKMARK [1][-]{section.5}{Conclusion}{}% 15
+\BOOKMARK [1][-]{section.6}{Appendix}{}% 16
+\BOOKMARK [2][-]{subsection.6.1}{GLquadrature.m}{section.6}% 17
+\BOOKMARK [2][-]{subsection.6.2}{Kaczmarz.m}{section.6}% 18
