@@ -1,0 +1,143 @@
+---
+title: "1710-351-451-Proj1-Report-dxd310"
+author: "Abhi Devathi"
+date: "10/3/2017"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(root.dir = "../", echo = TRUE)
+root <- "/Users/abhidevathi/Desktop/git/17f-dsci351-451-dxd310/1-assignments/proj/proj1/"
+setwd(root)
+library(tidyverse)
+library(ggplot2)
+library(netSEM)
+library(stringr)
+library(tibble)
+library(hyperSpec) # However I chose not to use this package.
+```
+
+# Summary
+
+This project asks us to clean data used for Hardcoat Acrylic Film Degradation project that was done in the Solar Durability and Lifetime Extension (SDLE) Center. The data is in many subfolders and not all of it is cleaned well, so it my task to take the data in this directory and clean it and make a big data frame. On that data frame, I will determine a structural equation model (SEM), network models of the degradation pathways using the netSEM package developd by the SDLE Center.
+
+# Part 1
+
+## Color Data
+
+The first part is to clean the data, which is the bulk of the report. I chose to first clean the color data.
+
+### Loading Given Files
+
+To begin, I load the key file, and the exposure files, making adjustments as needed.
+
+```{r}
+getwd()
+key <- read.csv("./AcrylicHardcoats/acryhc-key.csv", sep = ",", header = TRUE)
+exposures <- read.csv("./AcrylicHardcoats/acryhc-exp.csv", sep = ",", header = TRUE)
+```
+
+I notice that some of the variables are mislabeled, and we can have better names for other variables. So I do that cleaning.
+
+```{R}
+exposures <- exposures %>%
+  dplyr::rename(mASTMG154 = mASTG154) # This was labeled incorrectly in the CSV Data.
+# Renaming the column names in the key file for easier names
+key <- key %>%
+  dplyr::rename(ID = Sample.Number, material = Product.Name, exposure = Exposure, retain = Step.Number.Retained)
+
+# Let's try changing the material column to two columns, the second as substrate for better analysis
+rearrange.cols <- str_split_fixed(key$material, "-",2) # because the format is "XXXX-ABC"
+rearrange.cols <- as.data.frame(rearrange.cols)
+names(rearrange.cols) <- list("substrate", "material")
+levels(rearrange.cols$substrate) <- c(levels(rearrange.cols$substrate), "PURE") # adding PURE level for no coating
+for (i in 1:nrow(rearrange.cols)) { # iterate through all the samples and 
+  if(str_length(as.character(rearrange.cols$substrate[i])) <= 3) { # check if samples are pure because material
+                                                                   # 3 letters long
+    rearrange.cols$material[i] <- rearrange.cols$substrate[i] # adjust the new substrate columns
+    rearrange.cols$substrate[i] <- "PURE" # plug in PURE if there is no coating as new substrate
+  }
+}
+key$material <- NULL # We want to overwrite the material column with the new one
+key <- cbind(key, rearrange.cols) # Finally merge the columns for an updated keyfile
+write.csv(key, "./AcrylicHardcoats/acryhc-key-updated.csv", row.names = FALSE) # For Future use.
+```
+
+Now, we want to compile all the color data. It is important to collect the data by ID and step as those are the two most important identifying pieces of data for each measurement that we need to keep track of. The rest comes from the key file.
+
+```{r}
+
+## First we concatenate all the color data into a single data frame
+## and make sure the column names are the same
+
+# Reading in the Color Data for step 0
+setwd("./AcrylicHardcoats/color/step0/")
+filenames.step0 <- list.files("./", pattern = ".csv") # Find all files in the step0 folder
+files.step0 <- lapply(filenames.step0, read.csv) # Reads each file into a list of dataframes
+names(files.step0) <- filenames.step0
+
+color.step0 <- NULL # New Data Frame for step0 color data
+for (i in 1:length(filenames.step0)) {
+  files.step0[[i]]$step <- 0 # Assign step to the data frame.
+  color.step0 <- rbind(color.step0, files.step0[[i]])
+}
+
+# Reading in the Color Data for step 1
+setwd("../step1/")
+filenames.step1 <- list.files("./", pattern = ".csv")
+files.step1 <- lapply(filenames.step1, read.csv)
+names(files.step1) <- filenames.step1
+ 
+color.step1 <- NULL
+for (i in 1:length(filenames.step1)) {
+ files.step1[[i]]$step <- 1
+ color.step1 <- rbind(color.step1, files.step1[[i]])
+}
+
+```
+This process is repeated for all of the steps, but I will not show it because it is redundant.
+```{R, echo = FALSE}
+
+setwd("../step2/")
+filenames.step2 <- list.files("./", pattern = ".csv")
+files.step2 <- lapply(filenames.step2, read.csv)
+names(files.step2) <- filenames.step2
+
+color.step2 <- NULL
+for (i in 1:length(filenames.step2)) {
+  files.step2[[i]]$step <- 2
+  color.step2 <- rbind(color.step2, files.step2[[i]])
+}
+
+setwd("../step3/")
+filenames.step3 <- list.files("./", pattern = ".csv")
+files.step3 <- lapply(filenames.step3, read.csv)
+names(files.step3) <- filenames.step3
+
+color.step3 <- NULL
+for (i in 1:length(filenames.step3)) {
+  files.step3[[i]]$step <- 3
+  color.step3 <- rbind(color.step3, files.step3[[i]])
+}
+
+setwd("../step4/")
+filenames.step4 <- list.files("./", pattern = ".csv")
+files.step4 <- lapply(filenames.step4, read.csv)
+names(files.step4) <- filenames.step4
+
+color.step4 <- NULL
+for (i in 1:length(filenames.step4)) {
+  files.step4[[i]]$step <- 4
+  color.step4 <- rbind(color.step4, files.step4[[i]])
+}
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
