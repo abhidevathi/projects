@@ -9,13 +9,11 @@ Here I took an an image, blurred it and reconstructed it using a technique known
 By projecting onto each successive equation of the matrix, we eventually find the solution of the whole equation, which occurs at the intersection of all the planes (defined by each row of the linear system).
 
 This method is desirable because
-
-Markup :
-        * Simple implementations
-        * Rapidly convergent
-        * Stable with respect to round-off errors
-        * Method informs us of the quality of approximation at negligible computational cost
-        * Desirable properties of the system are preserved (e.g. symmetry, sparsity)
+* Simple implementations
+* Rapidly convergent
+* Stable with respect to round-off errors
+* Method informs us of the quality of approximation at negligible computational cost
+* Desirable properties of the system are preserved (e.g. symmetry, sparsity)
 
 
 
