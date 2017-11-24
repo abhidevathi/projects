@@ -4,9 +4,24 @@ This is a repository of a collection of my reports/projects/research projects an
 
 ## Kaczmarz Iteration.pdf
 
-School Project using Kaczmarz Iteration to solve an inverse problem that is ill-posed. 
+Here I took an an image, blurred it and reconstructed it using a technique known as Kaczmarz Iteration is a method of solving linear systems Ax = b. The idea is to consider the equation row by row, and project the current approximation to the solution (usually start at the origin) to the hyperplane of solutions defined by the equation from the first row of the matrix.
+
+By projecting onto each successive equation of the matrix, we eventually find the solution of the whole equation, which occurs at the intersection of all the planes (defined by each row of the linear system).
+
+This method is desirable because
+
+Markup :
+        * Simple implementations
+        * Rapidly convergent
+        * Stable with respect to round-off errors
+        * Method informs us of the quality of approximation at negligible computational cost
+        * Desirable properties of the system are preserved (e.g. symmetry, sparsity)
+
+
 
 ## Image Reconstruction - Tikhonov Regularization.pdf
+
+
 
 ## 1708-Devathi-TohokuPoster-Final.pdf
 
