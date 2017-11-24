@@ -1,0 +1,6 @@
+if they don’t start with sa, add sa or correct it
+
+next two numbers should be 22
+if it’s 0 after 2 or not, then remove it
+
+or remove the final decimal in each one.

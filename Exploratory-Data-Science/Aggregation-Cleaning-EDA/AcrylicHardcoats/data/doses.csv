@@ -1,0 +1,8 @@
+"exposure","hours","dose","doseType"
+"mASTMG154","1","0.21835","uva340"
+"ASTMG154","1","0.145566666666667","uva340"
+"ASTMG155","1","0.09382","uva340"
+"1x","1","0.04599","fullSpectrum"
+"5x","1",NA,"fullSpectrum"
+"baseline","1","0",NA
+"HF","1",NA,NA
