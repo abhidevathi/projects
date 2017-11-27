@@ -1,0 +1,187 @@
+---
+title: "hyperSpec Package Review"
+author: "Devin Gordon"
+date: "Thursday, March 05, 2015"
+output: ioslides_presentation
+---
+
+<!--
+# Script Name: hyperSpecReview.Rmd
+# Purpose: This is an R Markdown to review the utilities of the hyperSpec R package
+# Authors: Devin A. Gordon
+# License: Creative Commons Attribution-ShareAlike 4.0 International License.
+##########
+# Latest Changelog Entires:
+# v0.00.01 - Devin Gordon started blank script
+# v0.00.02 - Presentation renamed to V2 and changed to html output
+
+# Rmd code goes below the comment marker!
+-->
+
+#Background
+
+## Spectra - What are they?
+
+- "a specific set of values that can vary infinitely within a continuum"
+- Generally: 2-dimensional (sometimes higher) dimensional data, where the first dimension identifies points along a continuum, and the second dimension the values of a response of interest at the corresponding points
+- Examples: Optical, Mass, Political Alignment
+
+## Spectral Data - How do we store them?
+
+- Proprietary file format: not so useful
+- .csv files (ASCII): better ~ excel, R
+- .spc files (Binary): good ~ R
+
+## hyperSpec - How to manipulate .spc files in R
+
+- http://hyperspec.r-forge.r-project.org/
+- Handles spectral data
+- Features: Convenient import, spectral range selection, shfiting,  plotting/viewing, normalization, smoothing, correction, arithmetic, initial data analysis
+
+
+#hyperSpec Examples
+```{r, echo=FALSE}
+library(hyperSpec)
+```
+
+## File Import
+
+```{r}
+# Read one .spc file and check its structure
+setwd("V:/vuv-data/instr/spectra/")
+curfile <- "./Fluorescence/initial_pet_Trial/corrected_pet_unstab_cyclic_quv_ex320/sa19603_00_ex320.spc"
+step0 <- read.spc(curfile)
+class(step0)
+step0
+```
+
+## Basic Plotting
+
+```{r}
+#Plot with hyperSpec base plotting
+
+plotspc(step0)
+```
+
+## Multiple .spc Files?
+
+- (Purposefully without a loop)
+```{r}
+# Read multiple .spc files
+
+setwd("./data/corrected_pet_unstab_cyclic_quv_ex320/")
+curfile <- "./sa19603_00_ex320.spc"
+step0 <- read.spc(curfile)
+curfile <- "./sa19603_22_ex320.spc"
+step1 <- read.spc(curfile)
+curfile <- "./sa19603_23_ex320.spc"
+step2 <- read.spc(curfile)
+curfile <- "./sa19603_24_ex320.spc"
+step3 <- read.spc(curfile)
+curfile <- "./sa19603_25_ex320.spc"
+step4 <- read.spc(curfile)
+curfile <- "./sa19603_26_ex320.spc"
+step5 <- read.spc(curfile)
+curfile <- "./sa19603_27_ex320.spc"
+step6 <- read.spc(curfile) 
+curfile <- "./sa19603_28_ex320.spc"
+step7 <- read.spc(curfile)
+```
+
+## Combine into one object (Good News!)
+
+```{r}
+# Use Collpase to combine spectra
+
+spec <- collapse(step0, step1, step2, step3, step4, step5, step6, step7)
+class(spec)
+spec
+```
+
+## Basic Plotting
+
+```{r}
+plotspc(spec)
+```
+
+## Spectral Range Selection
+
+```{r}
+#Subset and redifine the hyperSpec object according to wavelength
+
+spec <- spec [,, min ~ 600]
+spec
+```
+
+## Basic Plotting
+
+
+```{r}
+plotspc(spec)
+```
+
+## Spectral Arithmetic (Subtraction)
+```{r}
+#Perform spectral subtraction
+
+sub <- step7-step0
+plotspc(sub[,, min ~ 600])
+```
+
+## Removing Bad Data
+```{r}
+# Let's look at some fake IR data
+ir.spc <- chondro
+ir.spc
+plotspc(ir.spc, spc.nmax = length(ir.spc))
+```
+
+## Removing Bad Data
+```{r}
+#Define any point above 1500 as bad
+high.int <- apply (ir.spc > 1500, 1, any)
+
+#Maximum should atleast be 0.1 
+low.int <- apply (ir.spc, 1, max) < 0.1
+
+#Apply Conditions
+ir.spc <- ir.spc [! high.int & ! low.int]
+```
+
+## Removed the bad spectra
+```{r}
+plotspc(ir.spc, spc.nmax = length(ir.spc))
+```
+
+## Baseline Correction (One of many options)
+```{r}
+# Apply basline correction function
+blcorr <- spc.fit.poly.below (ir.spc)
+
+# Subtract away correction from original
+ir.spc <- ir.spc - blcorr
+```
+
+## Corrected Spectra!
+```{r}
+plotspc(ir.spc)
+```
+
+## Matrix Plot - IR Data
+```{r}
+plotmat(ir.spc)
+```
+
+## Stacked Spectra
+
+```{r}
+plotspc(spec, stacked = TRUE)
+```
+
+# Summary
+
+## hyperSpec
+
+- hyperSpec is a powerful R package for handling and manipulating spectral data in R
+- More to come!
+

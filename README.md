@@ -9,7 +9,7 @@ Here I took an an image, blurred it and reconstructed it using a technique known
 By projecting onto each successive equation of the matrix, we eventually find the solution of the whole equation, which occurs at the intersection of all the planes (defined by each row of the linear system).
 
 This method is desirable because
-* Simple implementations
+* Simple implementation
 * Rapidly convergent
 * Stable with respect to round-off errors
 * Method informs us of the quality of approximation at negligible computational cost
@@ -19,7 +19,7 @@ This method is desirable because
 
 ## Image Reconstruction - Tikhonov Regularization.pdf
 
-
+This is a project where I took a given image, blurred it using a Gaussian blurring technique, and reconstructed it using an inverse method known as Tikhonov Regularization, which penalizes the method
 
 ## 1708-Devathi-TohokuPoster-Final.pdf
 
@@ -31,6 +31,14 @@ This project was part of my Exploratory Data Science class. The professor is als
 
 Skills I learned primarily include data cleaning using dplyr, and beginning to perform a network model using the <S|M|R> technique, or the Stressor/Mechanism/Response Framework, that is described in the report.
 
-## 1711-04-Resume.pdf
+All the data and scripts can be found in ./Exploratory-Data-Science/Aggregation-Cleaning-EDA.
 
-This is my Resume, updated as of November 4th, 2017.
+## 1711-DSCI-351-451-Proj3-Report-dxd310.pdf
+
+This project was focused on analyzing linear models of color data and FTIR data of a degradation study of PV module backsheets. It's part of the same class as Proj1 described above.
+
+Skills I learned were model validation and analysis using spectral data using the hyperSpec package in CRAN.
+
+## 1711-23-Resume.pdf
+
+This is my Resume, updated as of November 23rd, 2017.

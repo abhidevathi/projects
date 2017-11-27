@@ -1,0 +1,616 @@
+---
+title: "Accelerated Aging of PV Backsheets"
+author: "Abhi Devathi"
+date: "11/20/2017"
+output: pdf_document
+---
+
+<!--
+# Script Name: 1711cwru-dsci351-451-Proj3-Report-dxd310.Rmd
+# Purpose: This is a markdown documentation for project 3.
+# Authors: Abhi Devathi
+# License: Creative Commons Attribution-ShareAlike 4.0 International License.
+##########
+# Latest Changelog Entires:
+# v0.00.01 - 1710cwru-dsci351-451-Proj3-Report-dxd310.Rmd - Abhi Devathi created this RMD
+##########
+
+# Rmd code goes below the comment marker!
+-->
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(tidy.opts=list(width.cutoff=80), tidy = TRUE, echo = TRUE,
+                      warning = FALSE, message = FALSE)
+library(dplyr)
+library(tidyverse)
+library(lme4)
+library(leaps)
+library(caret)
+library(hyperSpec)
+```
+# Aggregation and Tidying
+## Optical Data Aggregation and Tidying
+
+```{r}
+data.optical <- read.csv("./DSCI-352-optival_data.csv")
+
+# Shorten the variable names a bit and a Material Column
+data.optical <- data.optical %>% rename('exposure' = 'Exposure_Type',
+                                        'hours' = 'Exposure_Hours',
+                                        'YI' = 'Yellowness_Index',
+                                        'g60' = 'Gloss_60degree') %>%
+  mutate(Material = ifelse(SampleID == "sa31001", "PVDF", ifelse(
+    SampleID == "sa31002", "FCB", ifelse(
+      SampleID == "sa31003", "PET", ifelse(
+        SampleID == "sa31004", "PVF", "AAA"
+      )
+    )
+  )), SampleID = as.factor(SampleID), couponID = as.factor(couponID),
+  exposure = exposure, Measurement_Times = as.factor(Measurement_Times), 
+  Material = as.factor(Material))
+str(data.optical)
+```
+
+## FTIR Data Aggregation and Tidying
+
+
+Here is a function that creates the data frame of FTIR data for a given sub-directory of folders. We will use this function to create FTIR data frames for eadh exposure (since they are in each folder), and then do analysis based on that. 
+```{r}
+
+# Function takes in a given directory, and its associated exposure type
+# Returns an spc object with all the associated metadata.
+
+ftir <- function(dir, exposure) {
+  curDir <- getwd()
+  setwd(dir)
+  files <- list.files(path = "./", pattern = "*.dpt")
+  for (i in 1:length(files)) {
+    # Get some metadata from the filename
+    curFile <- files[i]
+    
+    m <- regexpr("SPA.*dpt",curFile)
+    id <- substr(curFile, m - 8, m - 8) # sample ID
+    id <- paste0("sa3100", id, collapse = "")
+    # couponID <- substr(curFile, m - 6, m - 4) # couponID
+    mn <- as.numeric(substr(curFile, m - 2, m - 2)) # Measurement Number
+    exp <- exposure
+    hours <- parse_number(curFile)
+    step <- floor(hours/500)
+    coupon <- as.integer(substr(curFile, m-6, m-4))
+    
+    m <- regexpr("P.*.",curFile)
+    material <- substr(curFile, m, m + attr(m,"match.length")-17)
+    material <- ifelse(material == "PA", "AAA", material)
+    # Read the dpt file as a csv and grab the second column
+    if (i == 1) {
+      wavelength <- read.csv(curFile, header = FALSE)$V1
+      spectra <- read.csv(curFile, header = FALSE)$V2
+    } else {
+      spectra <- read.csv(curFile, header = FALSE)$V2
+    }
+    
+    # Create hyperSpec Object
+    spectrum <- new("hyperSpec", spc = spectra, wavelength = wavelength)
+    if (i == 1) {
+      ftir <- spectrum
+      
+      ftir@data$SampleID <- id
+      ftir@data$Exposure <- exp
+      ftir@data$CouponID <- coupon
+      ftir@data$Material <- material
+      
+      ftir@data$hours <- hours
+      
+      ftir@data$Step <- step
+      
+      ftir@data$Measurement_Times <- mn
+      
+    } else {
+      
+      # Add meta data to hyperSpec object
+      spectrum@data$SampleID <- id
+      spectrum@data$Exposure <- exp
+      spectrum@data$CouponID <- coupon
+      spectrum@data$Material <- material
+      
+      spectrum@data$hours <- hours
+      
+      spectrum@data$Step <- step
+      
+      spectrum@data$Measurement_Times <- mn
+      
+      
+      # Combine spectrum with other spectra
+      
+      ftir <- hyperSpec::collapse(ftir,spectrum)
+    }
+  }
+  setwd(curDir)
+  return(ftir)
+}
+```
+
+Now, we will use the previously created function and create the spc objects for each exposure and combine them into one. 
+
+```{r}
+ftir.DH <- ftir(dir = "./FTIR/DampHeat-FTIR/", exposure = "DampHeat")
+ftir.X1 <- ftir(dir = "./FTIR/XENON1-FTIR", exposure = "Xenon#1")
+ftir.X2 <- ftir(dir = "./FTIR/XENON2-FTIR", exposure = "Xenon#2")
+
+# We will use this hyperSpec object to subset the data and plot them accordingly
+ftir.all <- hyperSpec::collapse(ftir.DH, ftir.X1, ftir.X2)
+```
+
+
+# Visualizing Yellowness Index and Gloss of PVDF/PET/EVA Samples
+
+```{r}
+
+## YI Plot
+YI.plot <- data.optical %>% filter(Material == "PVDF") %>%
+  ggplot(aes(x = hours, y = YI)) + 
+  geom_point(aes(color = exposure)) + 
+  geom_smooth(mapping = aes(color = exposure), method = "lm") + 
+  labs(color = "Exposure") + 
+  xlab("Exposure Time (Hours)") + ylab("Yellowness Index (YI)") + 
+  ggtitle("Yellowness Index of PVDF/PET/EVA") + 
+  theme(plot.title = element_text(hjust = 0.5))
+
+## Gloss Plot
+gloss.plot <- data.optical %>% filter(Material == "PVDF") %>%
+  ggplot(aes(x = hours, y = g60)) + 
+  geom_point(aes(color = exposure)) + 
+  geom_smooth(mapping = aes(color = exposure), method = "lm") + 
+  labs(color = "Exposure") + 
+  xlab("Exposure Time (Hours)") + ylab("Gloss at 60°") + 
+  ggtitle("Gloss at 60° of PVDF/PET/EVA") + 
+  theme(plot.title = element_text(hjust = 0.5))
+YI.plot
+gloss.plot
+```
+
+## Trends Observed
+
+### Yellowness Index
+
+It seems that the yellowness index increases at a much higher rate in the Damp Heat exposure than the Arc Xenon Exposures, even though the Arc Xenon exposure were over a much greater time frame than the Damp Heat exposure.
+
+### Gloss at 60 Degrees
+
+The gloss for the Damp Heat exposure seemed to increase as the exposure went on. This might be due to added moisture to the sample that could've smoothed the surface and made it more possible for light to reflect off of the surface. Also, the spread of the gloss is very high so change in gloss may not have been a good mechanism for detecting degradation in the PVDF samples. 
+
+# How do YI and Gloss relate to material degradation?
+
+## Yellowness Index
+
+As a material degrades, in general, the more yellow it becomes. Therefore, to look for signs of degradation, we characterize samples by its yellowness index and the more it increases, the more the sample degrades. 
+
+## Gloss
+
+Gloss is a quantitative measurement that describes how well light is reflected off of a surface. This happens best when the surface is smooth. Generally, when polymers degrade the polymer becomes more course, so a decrease in gloss is said to correlate with degradation. 
+
+# Develop Degradation Models
+
+## Develop a Linear Model for each material with each exposure to each condition
+
+```{r}
+# PVDF Models: sa31001
+PVDF.YI.DH <-lm(YI ~ hours, data = data.optical %>% 
+                  filter(Material == "PVDF", exposure == "DampHeat"))
+PVDF.YI.X1 <-lm(YI ~ hours, data = data.optical %>% 
+                  filter(Material == "PVDF", exposure == "Xenon#1"))
+PVDF.YI.X2 <-lm(YI ~ hours, data = data.optical %>% 
+                  filter(Material == "PVDF", exposure == "Xenon#2"))
+
+PVDF.G60.DH <-lm(g60 ~ hours, data = data.optical %>% 
+                  filter(Material == "PVDF", exposure == "DampHeat"))
+PVDF.G60.X1 <-lm(g60 ~ hours, data = data.optical %>% 
+                  filter(Material == "PVDF", exposure == "Xenon#1"))
+PVDF.G60.X2 <-lm(g60 ~ hours, data = data.optical %>% 
+                  filter(Material == "PVDF", exposure == "Xenon#2"))
+```
+
+Now we create the models for the rest of the materials, but we shall hide them.
+```{r, echo = FALSE}
+# FCB Models: sa31002
+FCB.YI.DH <-lm(YI ~ hours, data = data.optical %>% 
+                  filter(Material == "FCB", exposure == "DampHeat"))
+FCB.YI.X1 <-lm(YI ~ hours, data = data.optical %>% 
+                  filter(Material == "FCB", exposure == "Xenon#1"))
+FCB.YI.X2 <-lm(YI ~ hours, data = data.optical %>% 
+                  filter(Material == "FCB", exposure == "Xenon#2"))
+
+FCB.G60.DH <-lm(g60 ~ hours, data = data.optical %>% 
+                  filter(Material == "FCB", exposure == "DampHeat"))
+FCB.G60.X1 <-lm(g60 ~ hours, data = data.optical %>% 
+                  filter(Material == "FCB", exposure == "Xenon#1"))
+FCB.G60.X2 <-lm(g60 ~ hours, data = data.optical %>% 
+                  filter(Material == "FCB", exposure == "Xenon#2"))
+
+
+# PET Models: sa31003
+PET.YI.DH <-lm(YI ~ hours, data = data.optical %>% 
+                  filter(Material == "PET", exposure == "DampHeat"))
+PET.YI.X1 <-lm(YI ~ hours, data = data.optical %>% 
+                  filter(Material == "PET", exposure == "Xenon#1"))
+PET.YI.X2 <-lm(YI ~ hours, data = data.optical %>% 
+                  filter(Material == "PET", exposure == "Xenon#2"))
+
+PET.G60.DH <-lm(g60 ~ hours, data = data.optical %>% 
+                  filter(Material == "PET", exposure == "DampHeat"))
+PET.G60.X1 <-lm(g60 ~ hours, data = data.optical %>% 
+                  filter(Material == "PET", exposure == "Xenon#1"))
+PET.G60.X2 <-lm(g60 ~ hours, data = data.optical %>% 
+                  filter(Material == "PET", exposure == "Xenon#2"))
+
+# PVF Models: sa31004
+PVF.YI.DH <-lm(YI ~ hours, data = data.optical %>% 
+                  filter(Material == "PVF", exposure == "DampHeat"))
+PVF.YI.X1 <-lm(YI ~ hours, data = data.optical %>% 
+                  filter(Material == "PVF", exposure == "Xenon#1"))
+PVF.YI.X2 <-lm(YI ~ hours, data = data.optical %>% 
+                  filter(Material == "PVF", exposure == "Xenon#2"))
+
+PVF.G60.DH <-lm(g60 ~ hours, data = data.optical %>% 
+                  filter(Material == "PVF", exposure == "DampHeat"))
+PVF.G60.X1 <-lm(g60 ~ hours, data = data.optical %>% 
+                  filter(Material == "PVF", exposure == "Xenon#1"))
+PVF.G60.X2 <-lm(g60 ~ hours, data = data.optical %>% 
+                  filter(Material == "PVF", exposure == "Xenon#2"))
+
+# AAA Models: sa31005
+
+AAA.YI.DH <-lm(YI ~ hours, data = data.optical %>% 
+                  filter(Material == "AAA", exposure == "DampHeat"))
+AAA.YI.X1 <-lm(YI ~ hours, data = data.optical %>% 
+                  filter(Material == "AAA", exposure == "Xenon#1"))
+AAA.YI.X2 <-lm(YI ~ hours, data = data.optical %>% 
+                  filter(Material == "AAA", exposure == "Xenon#2"))
+
+AAA.G60.DH <-lm(g60 ~ hours, data = data.optical %>% 
+                  filter(Material == "AAA", exposure == "DampHeat"))
+AAA.G60.X1 <-lm(g60 ~ hours, data = data.optical %>% 
+                  filter(Material == "AAA", exposure == "Xenon#1"))
+AAA.G60.X2 <-lm(g60 ~ hours, data = data.optical %>% 
+                  filter(Material == "AAA", exposure == "Xenon#2"))
+
+lms <- list(PVDF.G60.DH,PVDF.G60.X1,PVDF.G60.X2,PVDF.YI.DH,PVDF.YI.X1,PVDF.YI.X2,
+            FCB.G60.DH,FCB.G60.X1,FCB.G60.X2,FCB.YI.DH,FCB.YI.X1,FCB.YI.X2,
+            PET.G60.DH,PET.G60.X1,PET.G60.X2,PET.YI.DH,PET.YI.X1,PET.YI.X2,
+            PVF.G60.DH,PVF.G60.X1,PVF.G60.X2,PVF.YI.DH,PVF.YI.X1,PVF.YI.X2,
+            AAA.G60.DH,AAA.G60.X1,AAA.G60.X2,AAA.YI.DH,AAA.YI.X1,AAA.YI.X2)
+```
+
+
+
+## Plot the data and the linear model for all the Materials one Plot
+
+### YI Plots
+```{r}
+# YI Plots
+data.optical %>% filter(exposure == "DampHeat") %>%
+  ggplot() + geom_point(aes(x = hours, y = YI, color = Material)) + 
+  geom_smooth(method = lm, aes(x = hours, y = YI, color = Material, fill = Material)) +
+  ggtitle("Yellowness Index for Materials Exposed to Damp Heat") + 
+  theme(plot.title = element_text(hjust = 0.5))
+
+data.optical %>% filter(exposure == "Xenon#1") %>%
+  ggplot() + geom_point(aes(x = hours, y = YI, color = Material)) + 
+  geom_smooth(method = lm, aes(x = hours, y = YI, color = Material, fill = Material)) +
+  ggtitle("Yellowness Index for Materials Exposed to Xenon Arc #1") + 
+  theme(plot.title = element_text(hjust = 0.5))
+
+data.optical %>% filter(exposure == "Xenon#2") %>%
+  ggplot() + geom_point(aes(x = hours, y = YI, color = Material)) + 
+  geom_smooth(method = lm, aes(x = hours, y = YI, color = Material, fill = Material)) +
+  ggtitle("Yellowness Index for Materials Exposed to Xenon Arc #2") + 
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+### Gloss 60 Degree Plots
+```{r}
+# Gloss 60 Degrees Plots
+data.optical %>% filter(exposure == "DampHeat") %>%
+  ggplot() + geom_point(aes(x = hours, y = g60, color = Material)) + 
+  geom_smooth(method = lm, aes(x = hours, y = g60, color = Material, fill = Material)) +
+  ggtitle("Gloss at 60 Degrees for Materials Exposed to Damp Heat") + 
+  theme(plot.title = element_text(hjust = 0.5))
+
+data.optical %>% filter(exposure == "Xenon#1") %>%
+  ggplot() + geom_point(aes(x = hours, y = g60, color = Material)) + 
+  geom_smooth(method = lm, aes(x = hours, y = g60, color = Material, fill = Material)) +
+  ggtitle("Gloss at 60 Degrees for Materials Exposed to Xenon Arc #1") + 
+  theme(plot.title = element_text(hjust = 0.5))
+
+data.optical %>% filter(exposure == "Xenon#2") %>%
+  ggplot() + geom_point(aes(x = hours, y = g60, color = Material)) + 
+  geom_smooth(method = lm, aes(x = hours, y = g60, color = Material, fill = Material)) +
+  ggtitle("Gloss at 60 Degrees for Materials Exposed to Xenon Arc #2") + 
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+
+Check what colors are used:
+
+```{r}
+material.colors <- ggplot_build(
+  data.optical %>% filter(exposure == "Xenon#2") %>%
+  ggplot() + geom_point(aes(x = hours, y = g60, color = Material)) + 
+  geom_smooth(method = lm, aes(x = hours, y = g60, color = Material, fill = Material)) +
+  ggtitle("Gloss at 60 Degrees for Materials Exposed to Xenon Arc #2") + 
+  theme(plot.title = element_text(hjust = 0.5)))$data
+
+barplot(c(1, 1, 1, 1, 1), col = unique(material.colors[[1]]$colour), 
+        names.arg = unique(material.colors[[1]]$colour)) 
+AAA.color <- "#F8766D"
+PET.color <- "#00BF7D"
+
+```
+
+## Differences Between Data and Models
+
+It seems that some of the materials (such as PET) does not follow a linear trend, and therefore will require a power transformation which we will do later. Otherwise, it seems that the linear models describe the data pretty well for most materials and exposures and for both YI and Gloss. This goes to show you don't always need a complicated model to describe the data. 
+
+## Describe Which Materials Perform Best and Worst
+
+### Damp Heat
+
+#### Yellowness Index
+For the damp heat exposure, the best materials seem to be PVF that performed the best for yellowness index because it grew the least. 
+
+#### Gloss
+
+As for gloss, all the materials didn't degrade at all, except for the polyamide. 
+
+### Arc Xenon #1
+
+#### Yellowness Index
+
+Most of the materials (except PET) did not go up in yellowness index. And even the exception of PET degraded for the first 2000 hours but then didn't degrade anymore after that and tapered off.
+
+#### Gloss at 60 Degrees
+
+The PVDF material performed the best, as the gloss stayed constant throughout the exposure. However, the PET performed terribly as the gloss decreased dramatically. Although again, it did seem to taper off near the end of its exposure. 
+
+### Arc Xenon #2
+
+#### Yellowness Index
+
+Most materials did not increase too much in yellowness index for the duration of this exposure, except for PET again, which increased dramatically.
+
+#### Gloss at 60 Degrees
+
+The polyetheylene again decreased in gloss, but tapered off near the end of the exposure just like the Xenon #1 exposure. There seems to be a pattern here. All the others performed relatively well. 
+
+## Do any models appear non-linear? If so, do a power transformation.
+
+It seems that the following combinations of materials, exposures, characterizations are non-linear:
+
+* Yellowness Index - Polyamide - Damp Heat
+* Yellowness Index - polyethylene terephthalate - Xenon Arc #1
+* Yellowness Index - polyethylene terephthalate - Xenon Arc #2
+
+* Gloss 60 Degrees - Polyamide - Damp Heat
+* Gloss 60 Degrees - Polyethylene Terephthalate - Xenon Arc #1
+* Gloss 60 Degrees - Polyethylene Terephthalate - Xenon Arc #2
+
+We shall do a power transformation on the above models.
+
+```{r}
+data.optical %>% filter(exposure == "DampHeat", Material == "AAA") %>%
+  ggplot() + geom_jitter(aes(x = hours, y = YI, color = AAA.color), width = 8) + 
+  geom_smooth(method = "lm", aes(x = hours, y = YI)) +
+  geom_smooth(method = "lm", formula = y~poly(x, 2), aes(x = hours, y = YI)) + 
+  ggtitle("Yellowness Index for Polyamide (AAA) Exposed to Damp Heat") + 
+  theme(plot.title = element_text(hjust = 0.5),
+        legend.position = "none")
+
+data.optical %>% filter(exposure == "Xenon#1", Material == "PET") %>%
+  ggplot() + geom_jitter(aes(x = hours, y = YI), color = PET.color, width = 8) + 
+  geom_smooth(method = "lm", aes(x = hours, y = YI)) +
+  geom_smooth(method = "lm", formula = y~poly(x,2), aes(x = hours, y = YI)) + 
+  ggtitle("Yellowness Index for PET Exposed to Xenon Arc #1") + 
+  theme(plot.title = element_text(hjust = 0.5), 
+        legend.position = "none")
+
+# DEGREE 3 Transformation
+data.optical %>% filter(exposure == "Xenon#2", Material == "PET") %>%
+  ggplot() + geom_jitter(aes(x = hours, y = YI), color = PET.color, width = 8) + 
+  geom_smooth(method = "lm", aes(x = hours, y = YI)) +
+  geom_smooth(method = "lm", formula = y~poly(x,3), aes(x = hours, y = YI)) + 
+  ggtitle("Yellowness Index for PET Exposed to Xenon Arc #2") + 
+  theme(plot.title = element_text(hjust = 0.5), 
+        legend.position = "none")
+
+data.optical %>% filter(exposure == "DampHeat", Material == "AAA") %>%
+  ggplot() + geom_jitter(aes(x = hours, y = g60, color = AAA.color), width = 8) + 
+  geom_smooth(method = "lm", aes(x = hours, y = g60)) +
+  geom_smooth(method = "lm", formula = y~poly(x,2), aes(x = hours, y = g60)) + 
+  ggtitle("Gloss at 60 Degrees for PET Exposed to Damp Heat") + 
+  theme(plot.title = element_text(hjust = 0.5), 
+        legend.position = "none")
+
+data.optical %>% filter(exposure == "Xenon#1", Material == "PET") %>%
+  ggplot() + geom_jitter(aes(x = hours, y = g60, color = PET.color), width = 8) + 
+  geom_smooth(method = "lm", aes(x = hours, y = g60)) +
+  geom_smooth(method = "lm", formula = y~poly(x,3), aes(x = hours, y = g60)) + 
+  ggtitle("Gloss at 60 Degrees for PET Exposed to Xenon Arc #1") + 
+  theme(plot.title = element_text(hjust = 0.5), 
+        legend.position = "none")
+
+data.optical %>% filter(exposure == "Xenon#2", Material == "PET") %>%
+  ggplot() + geom_jitter(aes(x = hours, y = g60, color = PET.color), width = 8) + 
+  geom_smooth(method = "lm", aes(x = hours, y = g60)) +
+  geom_smooth(method = "lm", formula = y~poly(x,2), aes(x = hours, y = g60)) + 
+  ggtitle("Gloss at 60 Degrees for PET Exposed to Xenon Arc #2") + 
+  theme(plot.title = element_text(hjust = 0.5), 
+        legend.position = "none")
+```
+
+Much better.
+
+
+# Plot the FTIR Spectra
+
+We must plot the FTIR spectra of each backsheet and discuss the peak changes.
+
+FTIR spectra were only taken for Polyamide (PA/PA/PA), Polyethyelene (PET/PET/EVA), and PVF/PET/EVA.
+Therefore we can only do analysis on these three materials. 
+
+Further, the Arc Xenon #2 exposure only has data for step 4, so we cannot do a comparison of degradation over time with that exposure since it is not finished. 
+
+## Polyamide (AAA)
+```{r}
+base.AAA <- subset(ftir.all, ftir.all$Material == "AAA")
+```
+### Damp Heat
+Let's take a look at the Polyamide FTIR for Damp Heat
+```{r}
+base.AAA.DH <- subset(base.AAA, base.AAA$Exposure == "DampHeat")
+qplotspc(base.AAA.DH[c(1,5,8,13)], 
+         mapping = aes(x = .wavelength, y = spc, color = as.factor(Step))) + 
+  labs(title = "Damp Heat FTIR Spectra", x = "wavenumber",  y = "Absorbance",
+       color = "Step") + theme(plot.title = element_text(hjust = 0.5))
+```
+
+It's pretty clear that all the spectra were taken at measurements of different intensities, so to properly compare peak ratios and see if any peaks are degrading or being created as the sample gets exposed, we must normalize to a peak that doesn't change over time. It looks like there's a peak between 3100 and 3400, let's find the peak.
+
+Here we will normalize all the PolyAmide samples to the same peak. 
+```{r}
+indRange <- wl2i(base.AAA, 3100:3400)
+maxAbs <- which.max(base.AAA$spc[1,indRange])
+normPeak <- base.AAA@wavelength[indRange][maxAbs] # It's at 3288 for this one
+normIndex <- wl2i(base.AAA, normPeak)
+spcNorm <- 0*base.AAA$spc
+for (row in 1:nrow(base.AAA@data$spc)) {
+  spcNorm[row, ] <- base.AAA@data$spc[row, ] / base.AAA$spc[row, normIndex]
+  spcNorm[row, ] <- spcNorm[row, ] + 0.8
+}
+normalized <- decomposition(base.AAA, spcNorm, wavelength = base.AAA@wavelength, 
+                      label.wavelength = "normWV", label.spc = "normpeak", retain.columns = TRUE)
+normalized.DH <- subset(normalized, normalized$Exposure == "DampHeat")
+qplotspc(normalized.DH[c(1,10)], mapping = aes(x = .wavelength, y = spc, color = as.factor(Step))) + 
+  labs(title = "Polyamide Damp Heat FTIR Spectra Normalized to 3288", 
+       x = "wavenumber",  y = "Absorbance",
+       color = "Step") + theme(plot.title = element_text(hjust = 0.5))
+```
+
+You can see that the peak at around ~2400 degrades completely. This could be a sign of degradation.
+### Arc Xenon 1
+
+```{r}
+normalized.X1 <- subset(normalized, normalized$Exposure == "Xenon#1")
+qplotspc(normalized.X1[c(1,10)], mapping = aes(x = .wavelength, y = spc, color = as.factor(Step))) + 
+  labs(title = "Polyamide Arc Xenon #1 FTIR Spectra", x = "wavenumber",  y = "Absorbance",
+       color = "Step") + theme(plot.title = element_text(hjust = 0.5))
+```
+
+In the Arc Xenon #1 exposure, it's also apparent that the same peak degrades, as well as peaks at ~3600 cm^-1 and 1100 cm^-1. 
+
+## Polyethylene
+
+```{R}
+base.PET <- subset(ftir.all, ftir.all$Material == "PET")
+```
+
+### Damp Heat
+Let's take a look at the Polyethylene FTIR for Damp Heat
+```{r}
+base.PET.DH <- subset(base.PET, base.PET$Exposure == "DampHeat")
+qplotspc(base.PET.DH[c(1,7)], 
+         mapping = aes(x = .wavelength, y = spc, color = as.factor(Step))) + 
+  labs(title = "Polyethylene Damp Heat FTIR Spectra", x = "wavenumber",  y = "Absorbance",
+       color = "Step") + theme(plot.title = element_text(hjust = 0.5))
+```
+
+Now, we normalize all the PET spectra. Looks like the peak to normalize by is between 1100 and 1300, we shall take the max value in that range. 
+
+```{r}
+indRange <- wl2i(base.PET, 1100:1300)
+maxAbs <- which.max(base.PET$spc[1,indRange])
+normPeak <- base.PET@wavelength[indRange][maxAbs] # It's at 1269 for this one
+normIndex <- wl2i(base.PET, normPeak)
+spcNorm <- 0*base.PET$spc
+for (row in 1:nrow(base.PET@data$spc)) {
+  spcNorm[row, ] <- base.PET@data$spc[row, ] / base.PET$spc[row, normIndex]
+  spcNorm[row, ] <- spcNorm[row, ] + 0.8
+}
+normalized <- decomposition(base.PET, spcNorm, wavelength = base.PET@wavelength, 
+                      label.wavelength = "normWV", label.spc = "normpeak", retain.columns = TRUE)
+normalized.DH <- subset(normalized, normalized$Exposure == "DampHeat")
+qplotspc(normalized.DH[c(1,7)], mapping = aes(x = .wavelength, y = spc, color = as.factor(Step))) + 
+  labs(title = "Polyethylene Damp Heat Spectra Normalized to 1269", 
+       x = "wavenumber",  y = "Absorbance",
+       color = "Step") + theme(plot.title = element_text(hjust = 0.5))
+```
+
+
+### Arc Xenon 1
+
+```{r}
+normalized.X1 <- subset(normalized, normalized$Exposure == "Xenon#1")
+qplotspc(normalized.X1[c(1,10)], mapping = aes(x = .wavelength, y = spc, color = as.factor(Step))) + 
+  labs(title = "Polyethylene Arc Xenon #1 FTIR Spectra", x = "wavenumber",  y = "Absorbance",
+       color = "Step") + theme(plot.title = element_text(hjust = 0.5))
+```
+
+
+
+## PVF
+
+```{r}
+base.PVF <- subset(ftir.all, ftir.all$Material == "PVF")
+```
+
+### Damp Heat
+
+```{r}
+base.PVF.DH <- subset(base.PVF, base.PVF$Exposure == "DampHeat")
+qplotspc(base.PVF.DH[c(1,7)], 
+         mapping = aes(x = .wavelength, y = spc, color = as.factor(Step))) + 
+  labs(title = "PVF Damp Heat FTIR Spectra", x = "wavenumber",  y = "Absorbance",
+       color = "Step") + theme(plot.title = element_text(hjust = 0.5))
+```
+
+It seems like these spectra are already pretty equal, but we don't know about the other ones. Let's normalize to the peak ~1000 because that one seems to be stable through the exposure. 
+
+Here we will normalize all the PVF samples to the same peak. 
+```{r}
+indRange <- wl2i(base.PVF, 1000:1100)
+maxAbs <- which.max(base.PVF$spc[1,indRange])
+normPeak <- base.PVF@wavelength[indRange][maxAbs] # It's at 1087 for this one
+normIndex <- wl2i(base.PVF, normPeak)
+spcNorm <- 0*base.PVF$spc
+for (row in 1:nrow(base.PVF@data$spc)) {
+  spcNorm[row, ] <- base.PVF@data$spc[row, ] / base.PVF$spc[row, normIndex]
+  spcNorm[row, ] <- spcNorm[row, ] + 0.8
+}
+normalized <- decomposition(base.PVF, spcNorm, wavelength = base.PVF@wavelength, 
+                      label.wavelength = "normWV", label.spc = "normpeak", retain.columns = TRUE)
+normalized.DH <- subset(normalized, normalized$Exposure == "DampHeat")
+qplotspc(normalized.DH[c(1,7)], mapping = aes(x = .wavelength, y = spc, color = as.factor(Step))) + 
+  labs(title = "PVF Damp Heat FTIR Spectra Normalized to 1087", 
+       x = "wavenumber",  y = "Absorbance",
+       color = "Step") + theme(plot.title = element_text(hjust = 0.5))
+```
+
+Looks like the broad peak at 2100-2400 degrades completely, the peak at 3300 becomes apparent after the exposure, perhaps there is some moisture or something left over at the time of measurement of the FTIR spectrum.  
+
+### Arc Xenon #1
+```{r}
+normalized.X1 <- subset(normalized, normalized$Exposure == "Xenon#1")
+qplotspc(normalized.X1[c(1,7)], mapping = aes(x = .wavelength, y = spc, color = as.factor(Step))) + 
+  labs(title = "PVF Arc Xenon #1 FTIR Spectra", x = "wavenumber",  y = "Absorbance",
+       color = "Step") + theme(plot.title = element_text(hjust = 0.5))
+```
+
+The pattern is similar here, the spectra peaks degrade at both the 2100-2400. However, it seems that all the signal is completely gone past 3000, which doesn't happen with the Damp Heat exposure. Perhaps the wavelength in the light of the Xenon exposure degrades those wavelengths of materials in a special way. In any case, those findings are interesting. 
+
+
+# Which Backsheet Performed the Best
+
+From the optical data, it's hard to say which performed the best. Given the exception of Polyethylene terephthalate, all the materials did not increase in yellowness index too rapidly, and if they did they were all of the same rate given each exposure. However, it seems that by a small margin, the fluoro-coated backsheet performed the best in all the exposures for both the YI and the gloss as it degraded the least (YI didn't change much and Gloss didn't change much).
+
+Although there was no FTIR data for the fluoro-coated backsheet, we can still compare the other materials. And by doing so, we see pretty clearly that the polyethylene terephthalate was the worst performer of all the materials when looking at different regions of the spectra. First, it didn't have much signal at all past ~1500 cm^-1, and on top of that whatever signal there was, it completely degraded.
+
+Over all the best backsheet was the fluoro-coated backsheet and the worst backsheet was the Polyethylene Terephthalate. Even though the question doesn't ask for the worst, I think it's worth mentioning. 
