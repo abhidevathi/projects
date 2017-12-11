@@ -15,11 +15,13 @@ This method is desirable because
 * Method informs us of the quality of approximation at negligible computational cost
 * Desirable properties of the system are preserved (e.g. symmetry, sparsity)
 
-
-
 ## Image Reconstruction - Tikhonov Regularization.pdf
 
 This is a project where I took a given image, blurred it using a Gaussian blurring technique, and reconstructed it using an inverse method known as Tikhonov Regularization, which penalizes the method
+
+## Conjugate Gradient Least Squares.pdf
+
+
 
 ## 1708-Devathi-TohokuPoster-Final.pdf
 
