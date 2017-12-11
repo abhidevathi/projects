@@ -21,7 +21,7 @@ This is a project where I took a given image, blurred it using a Gaussian blurri
 
 ## Conjugate Gradient Least Squares.pdf
 
-
+* /Computational-Inverse-Problems/Conjugate Gradient Least Squares/
 
 ## 1708-Devathi-TohokuPoster-Final.pdf
 
