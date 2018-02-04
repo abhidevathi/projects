@@ -1,0 +1,55 @@
+\documentclass{article}
+
+\usepackage[pctex32]{graphics}
+\usepackage{amssymb}
+\usepackage[left=3cm,top=2cm,right=3cm,nohead,nofoot]{geometry}
+\usepackage{latexsym}
+\usepackage{epsfig}
+\parindent0pt
+\parskip6pt
+\pagestyle{empty}
+%\pagestyle{empty}
+%\usepackage{fancybox}
+\usepackage{pstcol}
+\newcommand{\R}{{\mathbb R}}
+\title{Homework 1}
+\author{Firstname Lastname}
+\begin{document}
+\maketitle
+
+This is a small template for homework. 
+
+\bigskip
+{\Large {\bf Problem 1}}
+\bigskip
+
+We write a Matlab code for computing
+\[
+ b = {\mathsf A}x,\quad x\sim{\mathcal N}(0,\sigma^2{\mathsf I}_3),
+\]
+where $\sigma = 0.1$. This is how I include a snippet of my Matlab code:
+
+\begin{verbatim}
+A     = [1,2,3, ...
+         4,5,6];
+sigma = 0.1;
+x     = sigma*randn(3,1);   % Random input
+b     = A*x;
+\end{verbatim}
+
+\bigskip
+{\Large {\bf Problem 2}}
+\bigskip
+
+This problem requires an inclusion of a figure that I produced using Matlab, see Figure~\ref{fig:my figure}. The figure files are saved in eps-format in the same folder where this text document is. Here is how I include the plot.
+
+\begin{figure}[h!]
+\centerline{
+\includegraphics[width= 6cm]{LeftPanel.eps}\includegraphics[width= 6cm]{RightPanel.eps}
+}
+\caption{\label{fig:my figure}The left panel represents the left panel of the figure, while, curiously, the right panel is the right panel. How about that?}
+\end{figure}
+
+and then the story continues.
+
+\end{document}
