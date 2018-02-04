@@ -41,6 +41,6 @@ This project was focused on analyzing linear models of color data and FTIR data 
 
 Skills I learned were model validation and analysis using spectral data using the hyperSpec package in CRAN.
 
-## 1711-23-Resume.pdf
+## 1801-19-Resume.pdf
 
-This is my Resume, updated as of November 23rd, 2017.
+This is my Resume, updated as of January 1st, 2018.
